@@ -5,7 +5,8 @@ View::View(HINSTANCE instance)
 	TBBUTTON toolbarButtons[] = {
 		{ MAKELONG(STD_FILEOPEN, NULL), IDM_OPEN, TBSTATE_ENABLED, BTNS_AUTOSIZE, {0}, 0, NULL },
 		{ MAKELONG(STD_FILESAVE, NULL), IDM_SAVE, TBSTATE_ENABLED, BTNS_AUTOSIZE, {0}, 0, NULL },
-		{ MAKELONG(STD_UNDO, NULL), IDM_UNDO, TBSTATE_ENABLED, BTNS_AUTOSIZE, {0}, 0, NULL }
+		{ MAKELONG(STD_UNDO, NULL), IDM_UNDO, TBSTATE_ENABLED, BTNS_AUTOSIZE, {0}, 0, NULL },
+		{ MAKELONG(STD_DELETE, NULL), IDM_DELETE, TBSTATE_ENABLED, BTNS_AUTOSIZE, {0}, 0, NULL }
 	};
 
 	this->instance = instance;
@@ -97,7 +98,7 @@ void View::OnMenuSelected(WORD item)
 	switch (item)
 	{
 	case IDM_OPEN:
-	case ID_FILE_OPEN:
+	case ID_FILE_ADD:
 	{
 		UI::OpenFileDialog dialog(instance, window->GetHandle(), "Виберіть файл(и)");
 		if (dialog.Show())
@@ -116,21 +117,28 @@ void View::OnMenuSelected(WORD item)
 	}
 	break;
 
-	case IDM_SAVE:
-	case ID_FILE_APPLY:
-		this->OnButtonCheckboxesApplyClick();
-		break;
-
-	case IDM_UNDO:
-	case ID_FILE_CANCEL:
-		this->statusBar->SetText("Відміна змін ...");
-		this->model.Restore();
+	case IDM_DELETE:
+	case ID_FILE_CLOSE_ALL:
+		this->model.Clear();
+		this->filesListView->ClearItems();
 		this->Update();
-		this->statusBar->SetText("ОК");
 		break;
 
 	case ID_FILE_EXIT:
 		this->window->Close();
+		break;
+
+	case IDM_SAVE:
+	case ID_EDIT_APPLY:
+		this->OnButtonCheckboxesApplyClick();
+		break;
+
+	case IDM_UNDO:
+	case ID_EDIT_UNDO:
+		this->statusBar->SetText("Відміна змін ...");
+		this->model.Restore();
+		this->Update();
+		this->statusBar->SetText("ОК");
 		break;
 
 	case ID_ABOUT:
