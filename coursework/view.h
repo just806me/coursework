@@ -39,5 +39,5 @@ private:
 	void OnButtonAttributeEditSetClick();
 	void OnFilesListViewSelectionChanged();
 	std::function<void()> OnCheckboxChanged(size_t);
-	static INT_PTR DialogFunc(HWND, UINT, WPARAM, LPARAM);
+	static INT_PTR CALLBACK DialogFunc(HWND, UINT, WPARAM, LPARAM);
 };
