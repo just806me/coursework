@@ -18,7 +18,7 @@ View::View(HINSTANCE instance)
 	this->font = CreateFont(16, 0, 0, 0, 400, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_OUTLINE_PRECIS,
 		CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY, VARIABLE_PITCH, "Segoe UI");
 
-	this->window = new UI::Window(this->instance, this->font, this->icon, "File Manager", 800, 632, this->menu,
+	this->window = new UI::Window(this->instance, this->font, this->icon, "Менеджер атрибутів", 800, 632, this->menu,
 		[this](WORD item) { this->OnMenuSelected(item); });
 
 	this->statusBar = new UI::StatusBar(this->instance, this->font, window->GetHandle(), "ОК");
