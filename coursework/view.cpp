@@ -18,7 +18,7 @@ View::View(HINSTANCE instance)
 	this->font = CreateFont(16, 0, 0, 0, 400, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_OUTLINE_PRECIS,
 		CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY, VARIABLE_PITCH, "Segoe UI");
 
-	this->window = new UI::Window(this->instance, this->font, this->icon, "Менеджер атрибутів", 800, 632, this->menu,
+	this->window = new UI::Window(this->instance, this->font, this->icon, "Менеджер атрибутів", 800, 608, this->menu,
 		[this](WORD item) { this->OnMenuSelected(item); });
 
 	this->statusBar = new UI::StatusBar(this->instance, this->font, window->GetHandle(), "ОК");
@@ -26,21 +26,19 @@ View::View(HINSTANCE instance)
 	this->toolbar = new UI::Toolbar(this->instance, this->font, window->GetHandle(), toolbarButtons,
 		_countof(toolbarButtons), [this](WORD item) { this->OnMenuSelected(item); });
 
-	this->groupBox1 = new UI::GroupBox(this->instance, this->font, window->GetHandle(), 588, 30, 194, 450,
+	this->groupBox1 = new UI::GroupBox(this->instance, this->font, window->GetHandle(), 588, 30, 194, 422,
 		"Задати атрибути візуально");
 
-	this->groupBox2 = new UI::GroupBox(this->instance, this->font, window->GetHandle(), 588, 480, 194, 70,
+	this->groupBox2 = new UI::GroupBox(this->instance, this->font, window->GetHandle(), 588, 452, 194, 48,
 		"Задати атрибути числом");
 
-	this->buttonCheckboxesApply = new UI::Button(this->instance, this->font, groupBox1->GetHandle(), "Застосувати",
-		4, 420, 186, 22, [this]() { this->OnButtonCheckboxesApplyClick(); });
+	this->buttonApply = new UI::Button(this->instance, this->font, window->GetHandle(), "Застосувати",
+		588, 502, 194, 22, [this]() { this->OnButtonApplyClick(); });
 
-	this->attributeEdit = new UI::NumberEdit(this->instance, this->font, groupBox2->GetHandle(), 4, 20, 186, 22);
+	this->attributeEdit = new UI::NumberEdit(this->instance, this->font, groupBox2->GetHandle(), 4, 20, 186, 22,
+		[this]() { this->OnAttributeEditChange(); });
 
-	this->buttonAttributeEditSet = new UI::Button(this->instance, this->font, groupBox2->GetHandle(), "Застосувати",
-		4, 44, 186, 22, [this]() { this->OnButtonAttributeEditSetClick(); });
-
-	this->filesListView = new UI::ListView(this->instance, this->font, window->GetHandle(), 2, 30, 584, 520,
+	this->filesListView = new UI::ListView(this->instance, this->font, window->GetHandle(), 2, 30, 584, 496,
 		[this]() { this->OnFilesListViewSelectionChanged(); });
 	this->filesListView->AddColumn("Файл", 580);
 
@@ -56,8 +54,7 @@ View::View(HINSTANCE instance)
 
 View::~View()
 {
-	delete buttonAttributeEditSet;
-	delete buttonCheckboxesApply;
+	delete buttonApply;
 	delete attributeEdit;
 	delete[] checkboxes;
 	delete filesListView;
@@ -131,7 +128,7 @@ void View::OnMenuSelected(WORD item)
 
 	case IDM_SAVE:
 	case ID_EDIT_APPLY:
-		this->OnButtonCheckboxesApplyClick();
+		this->OnButtonApplyClick();
 		break;
 
 	case IDM_UNDO:
@@ -162,7 +159,7 @@ void View::OnMenuSelected(WORD item)
 	}
 }
 
-void View::OnButtonCheckboxesApplyClick()
+void View::OnButtonApplyClick()
 {
 	this->statusBar->SetText("Збереження змін ...");
 	if (!this->model.Save())
@@ -174,27 +171,42 @@ void View::OnButtonCheckboxesApplyClick()
 	this->statusBar->SetText("ОК");
 }
 
-void View::OnButtonAttributeEditSetClick()
+void View::OnAttributeEditChange()
 {
-	DWORD value;
-	sscanf_s(this->attributeEdit->GetText().c_str(), "%lu", &value);
-	this->model.Set(value);
-	this->Update();
+	std::string text = this->attributeEdit->GetText();
+	if (text.size() > 0)
+	{
+		this->statusBar->SetText("Модифіковано");
+		DWORD value;
+		sscanf_s(text.c_str(), "%lu", &value);
+		this->model.Set(value);
+		this->Update();
+	}
 }
 
 std::function<void()> View::OnCheckboxChanged(size_t i)
 {
 	return [this, i]() {
+		switch (this->checkboxes[i]->GetState()) {
+		case BST_CHECKED:
+		case BST_INDETERMINATE:
+			this->model.Set(File::ATTRIBUTES[i].first, BST_UNCHECKED);
+			break;
+
+		case BST_UNCHECKED:
+			this->model.Set(File::ATTRIBUTES[i].first, BST_CHECKED);
+			break;
+		}
+
 		this->statusBar->SetText("Модифіковано");
-		this->model.Set(File::ATTRIBUTES[i].first, this->checkboxes[i]->GetState());
+		this->Update();
 	};
 }
 
 void View::SetEnabled(bool value)
 {
 	this->attributeEdit->SetEnabled(value);
-	this->buttonAttributeEditSet->SetEnabled(value);
-	this->buttonCheckboxesApply->SetEnabled(value);
+	this->buttonApply->SetEnabled(value);
 	for (size_t i = 0; i < File::ATTRIBUTES_COUNT; i++)
 		this->checkboxes[i]->SetEnabled(value);
 }
@@ -202,16 +214,13 @@ void View::SetEnabled(bool value)
 void View::OnFilesListViewSelectionChanged()
 {
 	this->model.SetSelection(this->filesListView->GetSelection());
-
 	this->Update();
 }
 
 void View::Update()
 {
 	if (this->model.IsSelectionEmpty())
-	{
 		this->SetEnabled(false);
-	}
 	else
 	{
 		DWORD set = this->model.GetSetMask(), unset = this->model.GetUnsetMask();

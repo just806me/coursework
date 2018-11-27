@@ -7,11 +7,12 @@ const char *UI::Element::GenClassName()
 
 	std::random_device rd;
 	std::mt19937 eng(rd());
-	std::uniform_int_distribution<> distr(0, _countof(alphabet) - 1);
+	std::uniform_int_distribution<> distr(0, 62);
 
 	char *name = new char[size];
+	name[0] = alphabet[0];
 
-	for (size_t i = 0; i < size; ++i)
+	for (size_t i = 1; i < size; ++i)
 		name[i] = alphabet[distr(eng)];
 
 	return name;

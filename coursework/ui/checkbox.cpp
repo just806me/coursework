@@ -3,7 +3,7 @@
 UI::Checkbox::Checkbox(HINSTANCE instance, HFONT font, HWND parent, const char *text, int x, int y, int width, int height,
 	std::function<void()> onChanged)
 {
-	this->handle = CreateWindowEx(NULL, "BUTTON", text, WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_AUTO3STATE,
+	this->handle = CreateWindowEx(NULL, "BUTTON", text, WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_3STATE,
 		x, y, width, height, parent, NULL, NULL, NULL);
 	this->OnChanged = onChanged;
 

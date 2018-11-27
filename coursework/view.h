@@ -31,12 +31,12 @@ private:
 	UI::GroupBox   *groupBox1, *groupBox2;
 	UI::ListView   *filesListView;
 	UI::NumberEdit *attributeEdit;
-	UI::Button     *buttonCheckboxesApply, *buttonAttributeEditSet;
+	UI::Button     *buttonApply;
 	std::unique_ptr<UI::Checkbox> *checkboxes;
 
 	void OnMenuSelected(WORD);
-	void OnButtonCheckboxesApplyClick();
-	void OnButtonAttributeEditSetClick();
+	void OnButtonApplyClick();
+	void OnAttributeEditChange();
 	void OnFilesListViewSelectionChanged();
 	std::function<void()> OnCheckboxChanged(size_t);
 	static INT_PTR CALLBACK DialogFunc(HWND, UINT, WPARAM, LPARAM);
