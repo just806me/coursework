@@ -54,6 +54,24 @@ void UI::ListView::AddColumn(char *caption, int width)
 	SendMessage(this->handle, LVM_INSERTCOLUMN, this->columnsCount++, (LPARAM)&column);
 }
 
+void UI::ListView::SelectAll()
+{
+	LVITEM item;
+	item.mask = LVIF_STATE;
+	item.stateMask = LVIS_SELECTED;
+	item.state = LVNI_SELECTED;
+	SendMessage(this->handle, LVM_SETITEMSTATE, -1, (LPARAM)&item);
+}
+
+void UI::ListView::Deselect()
+{
+	LVITEM item;
+	item.mask = LVIF_STATE;
+	item.stateMask = LVIS_SELECTED;
+	item.state = 0;
+	SendMessage(this->handle, LVM_SETITEMSTATE, -1, (LPARAM)&item);
+}
+
 void UI::ListView::ClearItems()
 {
 	SendMessage(this->handle, LVM_DELETEALLITEMS, NULL, NULL);

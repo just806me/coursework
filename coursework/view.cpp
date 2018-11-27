@@ -100,6 +100,7 @@ void View::OnMenuSelected(WORD item)
 	case IDM_OPEN:
 	case ID_FILE_ADD:
 	{
+		this->statusBar->SetText("Вибір файлу(ів) ...");
 		UI::OpenFileDialog dialog(instance, window->GetHandle(), "Виберіть файл(и)");
 		if (dialog.Show())
 		{
@@ -141,6 +142,16 @@ void View::OnMenuSelected(WORD item)
 		this->statusBar->SetText("ОК");
 		break;
 
+	case ID_EDIT_SELECT_ALL:
+		this->filesListView->SelectAll();
+		this->Update();
+		break;
+
+	case ID_EDIT_DESELECT:
+		this->filesListView->Deselect();
+		this->Update();
+		break;
+
 	case ID_ABOUT:
 		DialogBox(instance, MAKEINTRESOURCE(IDD_DIALOG1), this->window->GetHandle(), View::DialogFunc);
 		break;
@@ -174,6 +185,7 @@ void View::OnButtonAttributeEditSetClick()
 std::function<void()> View::OnCheckboxChanged(size_t i)
 {
 	return [this, i]() {
+		this->statusBar->SetText("Модифіковано");
 		this->model.Set(File::ATTRIBUTES[i].first, this->checkboxes[i]->GetState());
 	};
 }

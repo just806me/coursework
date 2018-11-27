@@ -17,6 +17,8 @@ namespace UI
 		void AddColumn(char const *, int);
 		void InsertItem(char *);
 		void InsertItem(char const *);
+		void SelectAll();
+		void Deselect();
 		void ClearItems();
 		std::vector<int> GetSelection();
 		LRESULT OnMessage(UINT, WPARAM, LPARAM) override;
