@@ -25,13 +25,14 @@ private:
 	HMENU     menu;
 	HICON     icon;
 
-	UI::Window     *window;
-	UI::StatusBar  *statusBar;
-	UI::Toolbar    *toolbar;
-	UI::GroupBox   *groupBox1, *groupBox2;
-	UI::ListView   *filesListView;
-	UI::NumberEdit *attributeEdit;
-	UI::Button     *buttonApply;
+	UI::Window      *window;
+	UI::StatusBar   *statusBar;
+	UI::Toolbar     *toolbar;
+	UI::GroupBox    *groupBox1, *groupBox2;
+	UI::ListView    *filesListView;
+	UI::NumberEdit  *attributeEdit;
+	UI::Button      *buttonApply;
+	UI::ProgressBar *progressBar;
 	std::unique_ptr<UI::Checkbox> *checkboxes;
 
 	void OnMenuSelected(WORD);

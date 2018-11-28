@@ -7,3 +7,4 @@
 #include "ui/list_view.h"
 #include "ui/number_edit.h"
 #include "ui/open_file_dialog.h"
+#include "ui/progress_bar.h"

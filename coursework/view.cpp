@@ -23,6 +23,8 @@ View::View(HINSTANCE instance)
 
 	this->statusBar = new UI::StatusBar(this->instance, this->font, window->GetHandle(), "ОК");
 
+	this->progressBar = new UI::ProgressBar(this->instance, this->font, this->statusBar->GetHandle(), 586, 2, 198, 20);
+
 	this->toolbar = new UI::Toolbar(this->instance, this->font, window->GetHandle(), toolbarButtons,
 		_countof(toolbarButtons), [this](WORD item) { this->OnMenuSelected(item); });
 
@@ -38,9 +40,8 @@ View::View(HINSTANCE instance)
 	this->attributeEdit = new UI::NumberEdit(this->instance, this->font, groupBox2->GetHandle(), 4, 20, 186, 22,
 		[this]() { this->OnAttributeEditChange(); });
 
-	this->filesListView = new UI::ListView(this->instance, this->font, window->GetHandle(), 2, 30, 584, 496,
+	this->filesListView = new UI::ListView(this->instance, this->font, window->GetHandle(), 2, 30, 584, 496, "Файл",
 		[this]() { this->OnFilesListViewSelectionChanged(); });
-	this->filesListView->AddColumn("Файл", 580);
 
 	this->checkboxes = new std::unique_ptr<UI::Checkbox>[File::ATTRIBUTES_COUNT];
 
@@ -99,18 +100,32 @@ void View::OnMenuSelected(WORD item)
 	{
 		this->statusBar->SetText("Вибір файлу(ів) ...");
 		UI::OpenFileDialog dialog(instance, window->GetHandle(), "Виберіть файл(и)");
+
+		this->SetEnabled(false);
+		this->filesListView->SetEnabled(false);
+		this->toolbar->SetEnabled(false);
+
 		if (dialog.Show())
 		{
 			this->statusBar->SetText("Завантаження файлу(ів) ...");
+
 			auto files = dialog.GetSelectedFiles();
-			this->model.Add(files);
+			this->progressBar->SetRange(files.size());
+			this->filesListView->SetDataSource(files);
+
 			for (auto &file : files)
 			{
-				this->filesListView->InsertItem(file.c_str());
+				this->model.Add(file);
+
+				this->progressBar->Step();
 				Sleep(1);
 			}
 		}
+
+		this->filesListView->SetEnabled(true);
+		this->toolbar->SetEnabled(true);
 		this->Update();
+
 		this->statusBar->SetText("ОК");
 	}
 	break;
@@ -162,13 +177,19 @@ void View::OnMenuSelected(WORD item)
 void View::OnButtonApplyClick()
 {
 	this->statusBar->SetText("Збереження змін ...");
-	if (!this->model.Save())
-	{
-		this->statusBar->SetText("Виникла помилка при збереженні змін");
-		return;
-	}
+	this->progressBar->SetRange(this->model.GetSelectionSize());
+
+	this->filesListView->SetEnabled(false);
+	this->toolbar->SetEnabled(false);
+	this->SetEnabled(false);
+
+	bool result = this->model.Save([this]() { this->progressBar->Step(); });
+
+	this->filesListView->SetEnabled(true);
+	this->toolbar->SetEnabled(true);
 	this->Update();
-	this->statusBar->SetText("ОК");
+
+	this->statusBar->SetText(result ? "ОК" : "Виникла помилка при збереженні змін");
 }
 
 void View::OnAttributeEditChange()

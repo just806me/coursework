@@ -69,6 +69,9 @@
     <ClCompile Include="callback_queue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ui\progress_bar.cpp">
+      <Filter>Source Files\ui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ui\window.h">
@@ -121,6 +124,9 @@
     </ClInclude>
     <ClInclude Include="callback_queue.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\progress_bar.h">
+      <Filter>Header Files\ui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

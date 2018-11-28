@@ -1,9 +1,8 @@
 #include "model.h"
 
-void Model::Add(std::vector<std::string> &files)
+void Model::Add(std::string &file)
 {
-	for (auto &file : files)
-		this->files.push_back(file);
+	this->files.push_back(file);
 }
 
 void Model::Clear()
@@ -12,12 +11,16 @@ void Model::Clear()
 	this->selection.clear();
 }
 
-bool Model::Save()
+bool Model::Save(std::function<void()> progressCallback)
 {
 	bool result = true;
 
 	for (auto i : this->selection)
+	{
 		result &= this->files[i].Save();
+		progressCallback();
+		Sleep(1);
+	}
 
 	return result;
 }
@@ -68,4 +71,9 @@ DWORD Model::GetUnsetMask()
 bool Model::IsSelectionEmpty()
 {
 	return this->selection.empty();
+}
+
+size_t Model::GetSelectionSize()
+{
+	return this->selection.size();
 }

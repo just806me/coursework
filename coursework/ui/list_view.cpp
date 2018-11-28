@@ -1,6 +1,6 @@
 #include "list_view.h"
 
-UI::ListView::ListView(HINSTANCE instance, HFONT font, HWND parent, int x, int y, int width, int height,
+UI::ListView::ListView(HINSTANCE instance, HFONT font, HWND parent, int x, int y, int width, int height, const char *caption,
 	std::function<void()> onSelectionChanged)
 {
 	INITCOMMONCONTROLSEX icex;
@@ -8,9 +8,8 @@ UI::ListView::ListView(HINSTANCE instance, HFONT font, HWND parent, int x, int y
 	InitCommonControlsEx(&icex);
 
 	this->OnSelectionChanged = onSelectionChanged;
-	this->columnsCount = this->itemsCount = 0;
-	this->handle = CreateWindowEx(WS_EX_CLIENTEDGE, WC_LISTVIEW, NULL, WS_CHILD | WS_VISIBLE
-		| LVS_REPORT | LVS_SHOWSELALWAYS, x, y, width, height, parent, NULL, instance, NULL);
+	this->handle = CreateWindowEx(WS_EX_CLIENTEDGE, WC_LISTVIEW, NULL, WS_CHILD | WS_VISIBLE | LVS_REPORT |
+		LVS_SHOWSELALWAYS | LVS_OWNERDATA, x, y, width, height, parent, NULL, instance, NULL);
 
 	if (!this->handle)
 		throw Exception("CreateWindow failed");
@@ -18,40 +17,20 @@ UI::ListView::ListView(HINSTANCE instance, HFONT font, HWND parent, int x, int y
 	this->InitializeElement(font);
 	SendMessage(this->handle, LVM_SETEXTENDEDLISTVIEWSTYLE, LVS_EX_FULLROWSELECT, LVS_EX_FULLROWSELECT);
 
-	//NOTIFY_HANDLER(IDC_FILELIST, LVN_ITEMCHANGED, OnListViewItemChanged)
-}
-
-void UI::ListView::AddColumn(char const *caption, int width)
-{
-	char *copy = _strdup(caption);
-	AddColumn(copy, width);
-	free(copy);
-}
-
-void UI::ListView::InsertItem(char const *text)
-{
-	char *copy = _strdup(text);
-	InsertItem(copy);
-	free(copy);
-}
-
-void UI::ListView::InsertItem(char *text)
-{
-	LVITEM item;
-	item.iItem = this->columnsCount++;
-	item.iSubItem = 0;
-	item.mask = LVIF_TEXT;
-	item.pszText = text;
-	SendMessage(this->handle, LVM_INSERTITEM, 0, (LPARAM)&item);
-}
-
-void UI::ListView::AddColumn(char *caption, int width)
-{
+	char *caption—opy = _strdup(caption);
 	LVCOLUMN column;
 	column.mask = LVCF_TEXT | LVCF_WIDTH;
-	column.pszText = caption;
-	column.cx = width;
-	SendMessage(this->handle, LVM_INSERTCOLUMN, this->columnsCount++, (LPARAM)&column);
+	column.pszText = caption—opy;
+	column.cx = width - 4;
+	SendMessage(this->handle, LVM_INSERTCOLUMN, NULL, (LPARAM)&column);
+	free(caption—opy);
+}
+
+void UI::ListView::SetDataSource(std::vector<std::string> &dataSource)
+{
+	this->dataSource.reserve(this->dataSource.size() + dataSource.size());
+	this->dataSource.insert(this->dataSource.end(), dataSource.begin(), dataSource.end());
+	SendMessage(this->handle, LVM_SETITEMCOUNT, this->dataSource.size(), NULL);
 }
 
 void UI::ListView::SelectAll()
@@ -74,8 +53,8 @@ void UI::ListView::Deselect()
 
 void UI::ListView::ClearItems()
 {
+	this->dataSource.clear();
 	SendMessage(this->handle, LVM_DELETEALLITEMS, NULL, NULL);
-	this->itemsCount = 0;
 }
 
 std::vector<int> UI::ListView::GetSelection()
@@ -97,12 +76,32 @@ LRESULT UI::ListView::OnMessage(UINT message, WPARAM wParam, LPARAM lParam)
 {
 	if (message == WM_NOTIFY)
 	{
-		if (this->OnSelectionChanged != nullptr)
+		switch (((NMHDR *)lParam)->code)
 		{
-			NMLISTVIEW *info = (NMLISTVIEW *)lParam;
-			if (info->hdr.code == LVN_ITEMCHANGED
-				&& ((info->uNewState & LVIS_SELECTED) == LVIS_SELECTED || (info->uOldState & LVIS_SELECTED) == LVIS_SELECTED))
-				CallbackQueue::GetInstance()->Push(this->OnSelectionChanged);
+		case LVN_GETDISPINFO:
+		{
+			auto info = (NMLVDISPINFO *)lParam;
+			info->item.pszText = &this->dataSource[info->item.iItem][0];
+		}
+		break;
+
+		case LVN_ODSTATECHANGED:
+			if (this->OnSelectionChanged != nullptr)
+			{
+				auto info = (NMLVODSTATECHANGE *)lParam;
+				if ((info->uNewState ^ info->uOldState) & LVIS_SELECTED)
+					CallbackQueue::GetInstance()->Push(this->OnSelectionChanged);
+			}
+			break;
+
+		case LVN_ITEMCHANGED:
+			if (this->OnSelectionChanged != nullptr)
+			{
+				auto info = (NMLISTVIEW *)lParam;
+				if ((info->uNewState ^ info->uOldState) & LVIS_SELECTED)
+					CallbackQueue::GetInstance()->Push(this->OnSelectionChanged);
+			}
+			break;
 		}
 
 		return 0;

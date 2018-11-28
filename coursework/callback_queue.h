@@ -10,7 +10,6 @@ class CallbackQueue
 {
 public:
 	void Push(std::function<void()>);
-	std::function<void()> Pop();
 
 	static CallbackQueue *GetInstance();
 

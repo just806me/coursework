@@ -155,6 +155,7 @@
     <ClCompile Include="ui\list_view.cpp" />
     <ClCompile Include="ui\number_edit.cpp" />
     <ClCompile Include="ui\open_file_dialog.cpp" />
+    <ClCompile Include="ui\progress_bar.cpp" />
     <ClCompile Include="ui\status_bar.cpp" />
     <ClCompile Include="ui\toolbar.cpp" />
     <ClCompile Include="ui\window.cpp" />
@@ -174,6 +175,7 @@
     <ClInclude Include="ui\group_box.h" />
     <ClInclude Include="ui\open_file_dialog.h" />
     <ClInclude Include="ui\prelude.h" />
+    <ClInclude Include="ui\progress_bar.h" />
     <ClInclude Include="ui\status_bar.h" />
     <ClInclude Include="ui\toolbar.h" />
     <ClInclude Include="ui\window.h" />
