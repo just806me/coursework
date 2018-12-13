@@ -6,7 +6,7 @@
 
 namespace UI
 {
-	class ProgressBar : Element
+	class ProgressBar : public Element
 	{
 	public:
 		ProgressBar(HINSTANCE, HFONT, HWND, int, int, int, int);
