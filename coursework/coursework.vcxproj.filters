@@ -142,4 +142,12 @@
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="help.chm">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="help.pdf">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
 </Project>

@@ -27,13 +27,16 @@
 #define ID_EDIT_DESELECT                40019
 #define ID_EDIT_SELECT_ALL              40020
 #define ID_EDIT_UNDO                    40021
+#define ID_40022                        40022
+#define ID_40023                        40023
+#define ID_HELP                         40024
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        110
-#define _APS_NEXT_COMMAND_VALUE         40022
+#define _APS_NEXT_COMMAND_VALUE         40025
 #define _APS_NEXT_CONTROL_VALUE         1001
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

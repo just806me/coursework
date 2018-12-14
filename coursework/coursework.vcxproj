@@ -188,6 +188,14 @@
     <Image Include="icon.bmp" />
     <Image Include="icon.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="help.chm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help.pdf">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

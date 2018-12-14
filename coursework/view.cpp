@@ -168,6 +168,10 @@ void View::OnMenuSelected(WORD item)
 		DialogBox(instance, MAKEINTRESOURCE(IDD_DIALOG1), this->window->GetHandle(), View::DialogFunc);
 		break;
 
+	case ID_HELP:
+		ShellExecute(this->window->GetHandle(), "open", "help.chm", NULL, NULL, SW_SHOW);
+		break;
+
 	default:
 		MessageBox(NULL, "Unimplemented!", "Information", MB_OK | MB_ICONINFORMATION);
 		break;
